@@ -1,6 +1,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <fstream>
 #include <iostream>
 
 // GLFW error callback
@@ -9,6 +10,30 @@ void errorCallback(int error, const char* description) {
 }
 
 
+std::string vertexShaderSrc = R"(
+#version 330
+
+in vec3 vertCoord;
+in vec4 vertColor;
+
+out vec4 fragColor;
+
+void main() {
+    gl_Position = vec4(coord, 1.0);
+    outColor = inColor;
+}
+)";
+
+std::string fragmentShaderSrc = R"(
+#version 330
+
+in vec4 fragColor;
+
+void main() {
+    gl_FragColor = fragColor;
+}
+)";
+
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
@@ -16,7 +41,7 @@ int main() {
         return -1;
     }
 
-    // Set GLFW to use OpenGL 3.3 core profile
+    // Configure OpenGL context
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,6 +68,19 @@ int main() {
     glfwSetErrorCallback(errorCallback);
 
     gladLoadGL();
+
+    float vertices[] = {
+            0.0f, 0.5f, 0.0f,
+            -0.5, -0.5, 0.0f,
+            0.5f, -0.5, 0.0f
+    };
+
+    GLuint vertexBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 3, vertices, GL_STATIC_DRAW);
+
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
